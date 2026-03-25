@@ -1,4 +1,4 @@
-﻿
+
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -2260,6 +2260,125 @@ public class Settings : INotifyPropertyChanged
 	public ContextSwitches RacingWheelSoftLockStrengthContextSwitches { get; set; } = new( true, false, false, false, false );
 	public ButtonMappings RacingWheelSoftLockStrengthPlusButtonMappings { get; set; } = new();
 	public ButtonMappings RacingWheelSoftLockStrengthMinusButtonMappings { get; set; } = new();
+
+	#endregion
+
+	#region Experimental wheel (non-iRacing session prefs)
+
+	private bool _experimentalWheelSoftLockEnabled = false;
+
+	public bool ExperimentalWheelSoftLockEnabled
+	{
+		get => _experimentalWheelSoftLockEnabled;
+
+		set
+		{
+			if ( value != _experimentalWheelSoftLockEnabled )
+			{
+				_experimentalWheelSoftLockEnabled = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	private float _experimentalWheelSoftLockStrength = 0.25f;
+
+	public float ExperimentalWheelSoftLockStrength
+	{
+		get => _experimentalWheelSoftLockStrength;
+
+		set
+		{
+			value = MathZ.Saturate( value );
+
+			if ( value != _experimentalWheelSoftLockStrength )
+			{
+				_experimentalWheelSoftLockStrength = value;
+
+				OnPropertyChanged();
+			}
+
+			UpdateExperimentalWheelSoftLockStrengthString();
+		}
+	}
+
+	private string _experimentalWheelSoftLockStrengthString = string.Empty;
+
+	[XmlIgnore]
+	public string ExperimentalWheelSoftLockStrengthString
+	{
+		get => _experimentalWheelSoftLockStrengthString;
+
+		set
+		{
+			if ( value != _experimentalWheelSoftLockStrengthString )
+			{
+				_experimentalWheelSoftLockStrengthString = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	private void UpdateExperimentalWheelSoftLockStrengthString()
+	{
+		if ( _experimentalWheelSoftLockStrength == 0f )
+		{
+			ExperimentalWheelSoftLockStrengthString = DataContext.Instance.Localization[ "OFF" ];
+		}
+		else
+		{
+			ExperimentalWheelSoftLockStrengthString = $"{_experimentalWheelSoftLockStrength * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+		}
+	}
+
+	private float _experimentalWheelSoftLockThreshold = 0.85f;
+
+	public float ExperimentalWheelSoftLockThreshold
+	{
+		get => _experimentalWheelSoftLockThreshold;
+
+		set
+		{
+			value = Math.Clamp( value, 0.05f, 0.999f );
+
+			if ( value != _experimentalWheelSoftLockThreshold )
+			{
+				_experimentalWheelSoftLockThreshold = value;
+
+				OnPropertyChanged();
+			}
+
+			ExperimentalWheelSoftLockThresholdString = $"{_experimentalWheelSoftLockThreshold * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+		}
+	}
+
+	private string _experimentalWheelSoftLockThresholdString = string.Empty;
+
+	[XmlIgnore]
+	public string ExperimentalWheelSoftLockThresholdString
+	{
+		get => _experimentalWheelSoftLockThresholdString;
+
+		set
+		{
+			if ( value != _experimentalWheelSoftLockThresholdString )
+			{
+				_experimentalWheelSoftLockThresholdString = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	public ContextSwitches ExperimentalWheelSoftLockStrengthContextSwitches { get; set; } = new( true, false, false, false, false );
+	public ButtonMappings ExperimentalWheelSoftLockStrengthPlusButtonMappings { get; set; } = new();
+	public ButtonMappings ExperimentalWheelSoftLockStrengthMinusButtonMappings { get; set; } = new();
+
+	public ContextSwitches ExperimentalWheelSoftLockThresholdContextSwitches { get; set; } = new( true, false, false, false, false );
+	public ButtonMappings ExperimentalWheelSoftLockThresholdPlusButtonMappings { get; set; } = new();
+	public ButtonMappings ExperimentalWheelSoftLockThresholdMinusButtonMappings { get; set; } = new();
 
 	#endregion
 

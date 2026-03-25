@@ -1,4 +1,4 @@
-﻿
+
 using System.Windows;
 
 using UserControl = System.Windows.Controls.UserControl;
@@ -77,6 +77,9 @@ public partial class AppSettingsPage : UserControl
 			{ MainWindow.AppPage.TradingPaints, localization[ "TradingPaints" ] },
 			{ MainWindow.AppPage.Graph, localization[ "Graph" ] },
 			{ MainWindow.AppPage.Simulator, localization[ "Simulator" ] },
+#if !ADMINBOXX
+			{ MainWindow.AppPage.ExperimentalWheel, localization[ "ExperimentalWheel" ] },
+#endif
 			{ MainWindow.AppPage.AppSettings, localization[ "AppSettings" ] },
 			{ MainWindow.AppPage.Contribute, localization[ "Contribute" ] },
 			{ MainWindow.AppPage.Donate, localization[ "Donate" ] }

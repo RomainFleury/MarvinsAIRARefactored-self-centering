@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1612,5 +1612,93 @@
   <data name="PresetReduceBigBumps" xml:space="preserve">
     <value>(Preset) Reduce Big Bumps</value>
     <comment>Settings to decrease the impact of big bumps</comment>
+  </data>
+  <data name="ExperimentalWheel" xml:space="preserve">
+    <value>Experimental wheel</value>
+    <comment>App menu — wheel centering without iRacing</comment>
+  </data>
+  <data name="ExperimentalWheel_UC" xml:space="preserve">
+    <value>EXPERIMENTAL WHEEL</value>
+    <comment>Page title</comment>
+  </data>
+  <data name="ExperimentalWheelIntro" xml:space="preserve">
+    <value>Use this page when iRacing is not running to apply centering force (and optional soft lock) on your steering device for games or apps that do not provide force feedback. Choose the steering device below, then turn the session on only while you stay on this page; leaving the page stops the effect.</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelExclusiveFFBWarning" xml:space="preserve">
+    <value>Warning: MAIRA opens the steering device in exclusive force-feedback mode while the session is active. Other software may not be able to use the wheel until you turn the session off or leave this page.</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelSession_UC" xml:space="preserve">
+    <value>SESSION</value>
+    <comment>Experimental wheel page group</comment>
+  </data>
+  <data name="ExperimentalWheelSessionActive" xml:space="preserve">
+    <value>Wheel centering session active</value>
+    <comment>Experimental wheel toggle</comment>
+  </data>
+  <data name="ExperimentalWheelSessionHint" xml:space="preserve">
+    <value>Turn on FFB power on the Racing wheel page, pick your device in the list above, then start the session here. The session ends when you switch to another menu page or when iRacing connects.</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelTuning_UC" xml:space="preserve">
+    <value>TUNING</value>
+    <comment>Experimental wheel page group</comment>
+  </data>
+  <data name="ExperimentalWheelTuningHint" xml:space="preserve">
+    <value>Centering strength uses the same global setting as the Racing wheel page. Soft lock below uses the wheel X axis from DirectInput (not iRacing).</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelDevice_UC" xml:space="preserve">
+    <value>DEVICE</value>
+    <comment>Experimental wheel page group</comment>
+  </data>
+  <data name="ExperimentalWheelNoDeviceSelected" xml:space="preserve">
+    <value>Current device: none selected — choose a force-feedback steering device in the list above.</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelSelectedDeviceFormat" xml:space="preserve">
+    <value>Current device: {0}</value>
+    <comment>Experimental wheel page; {0} = product name</comment>
+  </data>
+  <data name="ExperimentalWheelSelectedDeviceMissingFormat" xml:space="preserve">
+    <value>Current device: not in device list (GUID {0})</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelAxisNoDevice" xml:space="preserve">
+    <value>Steering axis (normalized −1 … +1): — (no device selected)</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelAxisFormat" xml:space="preserve">
+    <value>Steering axis (normalized −1 … +1): {0:F4}</value>
+    <comment>Experimental wheel page; {0} = position</comment>
+  </data>
+  <data name="ExperimentalWheelAxisNoData" xml:space="preserve">
+    <value>Steering axis: no data (device unplugged or not yet detected — try the Racing wheel page Refresh if needed)</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelSelectDeviceBeforeSession" xml:space="preserve">
+    <value>Select a steering device in the list before starting the session.</value>
+    <comment>Message box</comment>
+  </data>
+  <data name="ExperimentalWheelSoftLockEnabled" xml:space="preserve">
+    <value>Soft lock (standalone)</value>
+    <comment>Experimental wheel</comment>
+  </data>
+  <data name="ExperimentalWheelSoftLockStrength" xml:space="preserve">
+    <value>Standalone soft lock strength</value>
+    <comment>Experimental wheel knob</comment>
+  </data>
+  <data name="ExperimentalWheelSoftLockThreshold" xml:space="preserve">
+    <value>Soft lock start (axis %)</value>
+    <comment>Experimental wheel — where ramp begins toward full travel</comment>
+  </data>
+  <data name="ExperimentalWheelEnableFFBFirst" xml:space="preserve">
+    <value>Turn on force feedback power on the Racing wheel page before starting this session.</value>
+    <comment>Message box</comment>
+  </data>
+  <data name="ExperimentalWheelIRacingConnected" xml:space="preserve">
+    <value>Disconnect from iRacing or close the simulator before using this experimental session.</value>
+    <comment>Message box</comment>
   </data>
 </root>

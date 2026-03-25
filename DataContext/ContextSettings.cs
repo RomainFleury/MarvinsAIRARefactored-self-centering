@@ -1,4 +1,4 @@
-﻿
+
 using MarvinsAIRARefactored.Components;
 
 namespace MarvinsAIRARefactored.DataContext;
@@ -49,6 +49,10 @@ public class ContextSettings
 	public bool RacingWheelCenterWheelWhileRacing { get; set; } = false;
 	public bool RacingWheelCenterWheelWhileParked { get; set; } = true;
 	public bool RacingWheelFadeEnabled { get; set; } = true;
+
+	public bool ExperimentalWheelSoftLockEnabled { get; set; } = false;
+	public float ExperimentalWheelSoftLockStrength { get; set; } = 0.25f;
+	public float ExperimentalWheelSoftLockThreshold { get; set; } = 0.85f;
 
 	#endregion
 

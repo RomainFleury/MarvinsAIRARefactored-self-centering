@@ -1,4 +1,4 @@
-﻿
+
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -38,6 +38,10 @@ public partial class MainWindow : Window
 		Contribute,
 		Donate,
 		Debug
+#if !ADMINBOXX
+		,
+		ExperimentalWheel
+#endif
 	};
 
 	private const int UpdateInterval = 6;
@@ -58,6 +62,9 @@ public partial class MainWindow : Window
 	public static readonly ContributePage _contributePage = new();
 	public static readonly DonatePage _donatePage = new();
 	public static readonly DebugPage _debugPage = new();
+#if !ADMINBOXX
+	public static readonly ExperimentalWheelPage _experimentalWheelPage = new();
+#endif
 
 	private string? _installerFilePath = null;
 	private bool _initialized = false;
@@ -546,6 +553,12 @@ public partial class MainWindow : Window
 
 	private void Window_Closing( object sender, CancelEventArgs e )
 	{
+#if !ADMINBOXX
+
+		App.Instance?.DeactivateStandaloneCenteringSession();
+
+#endif
+
 		if ( _notifyIcon != null )
 		{
 			_notifyIcon.Visible = false;

@@ -1,4 +1,4 @@
-﻿
+
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -652,6 +652,26 @@ public class RacingWheel
 		return outputTorque;
 	}
 
+	public void ShutdownForceFeedbackAfterStandaloneSession()
+	{
+		var app = App.Instance!;
+
+		if ( _currentRacingWheelGuid == null )
+		{
+			return;
+		}
+
+		app.Logger.WriteLine( "[RacingWheel] ShutdownForceFeedbackAfterStandaloneSession" );
+
+		app.DirectInput.ShutdownForceFeedback();
+
+		_racingWheelPage.UpdateSteeringDeviceSection();
+
+		NextRacingWheelGuid = _currentRacingWheelGuid;
+
+		_currentRacingWheelGuid = null;
+	}
+
 	[MethodImpl( MethodImplOptions.AggressiveInlining )]
 	public void Update( float deltaMilliseconds )
 	{
@@ -662,6 +682,8 @@ public class RacingWheel
 			// easy reference to settings
 
 			var settings = DataContext.DataContext.Instance.Settings;
+
+			var standaloneSessionDisconnected = app.StandaloneCenteringSessionActive && !app.Simulator.IsConnected;
 
 			// initialize generated vibration torque
 
@@ -985,9 +1007,9 @@ public class RacingWheel
 				}
 			}
 
-			// if power button is off, or suspend is requested, or unsuspend counter is still counting down, or if sim mode is not "full", then suspend the racing wheel force feedback
+			// if power button is off, or suspend is requested, or unsuspend counter is still counting down, or if sim mode is not "full" (unless standalone experimental session), then suspend the racing wheel force feedback
 
-			if ( !settings.RacingWheelEnableForceFeedback || _isSuspended || ( _unsuspendTimerMS > 0f ) || ( app.Simulator.SimMode != "full" ) )
+			if ( !settings.RacingWheelEnableForceFeedback || _isSuspended || ( _unsuspendTimerMS > 0f ) || ( !standaloneSessionDisconnected && ( app.Simulator.SimMode != "full" ) ) )
 			{
 				if ( _currentRacingWheelGuid != null )
 				{
@@ -1005,6 +1027,11 @@ public class RacingWheel
 				_unsuspendTimerMS -= deltaMilliseconds;
 
 				return;
+			}
+
+			if ( standaloneSessionDisconnected )
+			{
+				app.DirectInput.PollDevices( deltaMilliseconds * 0.001f );
 			}
 
 			// if next racing wheel guid is set then re-initialize force feedback
@@ -1335,9 +1362,30 @@ public class RacingWheel
 				outputTorque += inputLFEMagnitude * settings.RacingWheelLFEStrength;
 			}
 
-			// add soft lock
+			// add soft lock (iRacing angles, or DirectInput axis in standalone experimental session)
 
-			if ( settings.RacingWheelSoftLockStrength > 0f )
+			if ( standaloneSessionDisconnected && settings.ExperimentalWheelSoftLockEnabled && ( settings.ExperimentalWheelSoftLockStrength > 0f ) )
+			{
+				var threshold = settings.ExperimentalWheelSoftLockThreshold;
+				var pos = app.DirectInput.ForceFeedbackWheelPosition;
+				var absPos = MathF.Abs( pos );
+
+				if ( absPos > threshold )
+				{
+					var span = MathF.Max( 1e-4f, 1f - threshold );
+					var overshoot = absPos - threshold;
+					var ramp = overshoot / span;
+					var sign = MathF.Sign( pos );
+
+					outputTorque += sign * ramp * 2f * settings.ExperimentalWheelSoftLockStrength;
+
+					if ( MathF.Sign( app.DirectInput.ForceFeedbackWheelVelocity ) != sign )
+					{
+						outputTorque += app.DirectInput.ForceFeedbackWheelVelocity * settings.ExperimentalWheelSoftLockStrength;
+					}
+				}
+			}
+			else if ( !standaloneSessionDisconnected && ( settings.RacingWheelSoftLockStrength > 0f ) )
 			{
 				var deltaToMax = ( app.Simulator.SteeringWheelAngleMax * 0.5f ) - MathF.Abs( app.Simulator.SteeringWheelAngle );
 
@@ -1368,9 +1416,9 @@ public class RacingWheel
 				outputTorque += MathZ.Lerp( 0f, app.DirectInput.ForceFeedbackWheelVelocity * settings.RacingWheelParkedFriction, parkedFactor );
 			}
 
-			// center wheel while racing and parked
+			// center wheel while racing and parked (or standalone experimental session without iRacing)
 
-			if ( app.Simulator.IsOnTrack )
+			if ( app.Simulator.IsOnTrack || standaloneSessionDisconnected )
 			{
 				var centeringForce = Math.Clamp( ( Math.Clamp( app.DirectInput.ForceFeedbackWheelPosition, -0.25f, 0.25f ) + app.DirectInput.ForceFeedbackWheelVelocity * 0.1f ) * settings.RacingWheelWheelCenteringStrength, -1f, 1f );
 
@@ -1551,9 +1599,11 @@ public class RacingWheel
 			_racingWheelPage.Record_MairaMappableButton.Disabled = !app.Simulator.IsOnTrack;
 			_racingWheelPage.Record_MairaMappableButton.Blink = app.RecordingManager.IsRecording;
 
-			// suspend racing wheel force feedback if iracing ffb is enabled or we are calibrating
+			// suspend racing wheel force feedback if iracing ffb is enabled or we are calibrating (standalone session allows FFB while disconnected)
 
-			SuspendForceFeedback = !app.Simulator.IsConnected || ( app.Simulator.SteeringFFBEnabled && !settings.RacingWheelAlwaysEnableFFB ) || app.SteeringEffects.IsCalibrating;
+			SuspendForceFeedback = ( !app.Simulator.IsConnected && !app.StandaloneCenteringSessionActive ) || ( app.Simulator.SteeringFFBEnabled && !settings.RacingWheelAlwaysEnableFFB ) || app.SteeringEffects.IsCalibrating;
+
+			app.MultimediaTimer.Suspend = !( app.Simulator.IsConnected || ( app.StandaloneCenteringSessionActive && settings.RacingWheelEnableForceFeedback ) );
 
 			/*
 			app.Debug.Label_1 = $"FadingIsActive: {FadingIsActive}";

@@ -1,4 +1,4 @@
-﻿
+
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -70,6 +70,9 @@ public partial class App : Application
 	public Wind Wind { get; private set; } = null!;
 	public HidHotplugMonitor HidHotplugMonitor { get; private set; } = null!;
 	public TradingPaints TradingPaints { get; private set; } = null!;
+
+	/// <summary>User armed "wheel centering without iRacing" from the experimental page; cleared on navigate away or when iRacing connects.</summary>
+	public bool StandaloneCenteringSessionActive { get; set; }
 
 	public GripOMeterWindow? GripOMeterWindow { get; set; }
 	public GapMonitorWindow? GapMonitorWindow { get; set; }
@@ -2389,6 +2392,29 @@ public partial class App : Application
 		return false;
 	}
 
+	public void DeactivateStandaloneCenteringSession()
+	{
+		if ( !StandaloneCenteringSessionActive )
+		{
+			return;
+		}
+
+		Logger.WriteLine( "[App] DeactivateStandaloneCenteringSession >>>" );
+
+		StandaloneCenteringSessionActive = false;
+
+		RacingWheel.ShutdownForceFeedbackAfterStandaloneSession();
+
+		MultimediaTimer.Suspend = !Simulator.IsConnected;
+
+		if ( Ready )
+		{
+			MainWindow.Dispatcher.Invoke( () => MainWindow._racingWheelPage.UpdateSteeringDeviceSection() );
+		}
+
+		Logger.WriteLine( "[App] <<< DeactivateStandaloneCenteringSession" );
+	}
+
 	private void OnTimer( object? sender, EventArgs e )
 	{
 		var app = Instance;
@@ -2397,7 +2423,12 @@ public partial class App : Application
 		{
 			if ( !app.Simulator.IsConnected )
 			{
-				app.DirectInput.PollDevices( 1f );
+				var settings = DataContext.DataContext.Instance.Settings;
+
+				if ( !( app.StandaloneCenteringSessionActive && settings.RacingWheelEnableForceFeedback ) )
+				{
+					app.DirectInput.PollDevices( 1f );
+				}
 
 				TriggerWorkerThread();
 			}

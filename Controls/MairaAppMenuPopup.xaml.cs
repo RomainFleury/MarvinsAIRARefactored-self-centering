@@ -1,9 +1,11 @@
-﻿
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
+
+using MarvinsAIRARefactored;
 
 using static MarvinsAIRARefactored.Windows.MainWindow;
 
@@ -187,6 +189,15 @@ namespace MarvinsAIRARefactored.Controls
 		{
 			if ( d is MairaAppMenuPopup mairaAppMenuPopup )
 			{
+#if !ADMINBOXX
+
+				if ( e.OldValue is AppPage oldPage && e.NewValue is AppPage newPage && oldPage == AppPage.ExperimentalWheel && newPage != AppPage.ExperimentalWheel )
+				{
+					App.Instance?.DeactivateStandaloneCenteringSession();
+				}
+
+#endif
+
 				var appPage = (AppPage) e.NewValue;
 
 				var match = mairaAppMenuPopup.AppMenuItems.FirstOrDefault( appMenuItem => appMenuItem.AppPage == appPage );
@@ -275,6 +286,12 @@ namespace MarvinsAIRARefactored.Controls
 				PageUserControl = _simulatorPage
 			} );
 
+			AppMenuItems.Add( new AppMenuItem
+			{
+				AppPage = AppPage.ExperimentalWheel,
+				PageUserControl = _experimentalWheelPage
+			} );
+
 #endif
 
 #if ADMINBOXX
@@ -334,6 +351,7 @@ namespace MarvinsAIRARefactored.Controls
 				AppPage.TradingPaints => _tradingPaintsPage,
 				AppPage.Graph => _graphPage,
 				AppPage.Simulator => _simulatorPage,
+				AppPage.ExperimentalWheel => _experimentalWheelPage,
 				AppPage.AdminBoxx => _adminBoxxPage,
 				AppPage.AppSettings => _appSettingsPage,
 				AppPage.Contribute => _contributePage,
@@ -401,6 +419,10 @@ namespace MarvinsAIRARefactored.Controls
 
 					case AppPage.Simulator:
 						menuItem.DisplayName = localization[ "Simulator" ];
+						break;
+
+					case AppPage.ExperimentalWheel:
+						menuItem.DisplayName = localization[ "ExperimentalWheel" ];
 						break;
 
 					case AppPage.AdminBoxx:
@@ -476,6 +498,10 @@ namespace MarvinsAIRARefactored.Controls
 
 				case AppPage.Simulator:
 					SelectedAppPageText = localization[ "Simulator_UC" ];
+					break;
+
+				case AppPage.ExperimentalWheel:
+					SelectedAppPageText = localization[ "ExperimentalWheel_UC" ];
 					break;
 
 				case AppPage.AdminBoxx:

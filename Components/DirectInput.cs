@@ -1,4 +1,4 @@
-﻿
+
 using System.Runtime.CompilerServices;
 
 using SharpDX.DirectInput;
@@ -334,6 +334,38 @@ public class DirectInput
 		}
 
 		_pollMutex = 0;
+	}
+
+	/// <summary>Normalized steering X (-1…+1) for UI; uses FFB cache when that device is active, otherwise last polled joystick state.</summary>
+	public bool TryGetNormalizedSteeringAxis( Guid deviceInstanceGuid, out float normalized )
+	{
+		normalized = 0f;
+
+		if ( deviceInstanceGuid == Guid.Empty )
+		{
+			return false;
+		}
+
+		if ( _forceFeedbackInitialized && ( deviceInstanceGuid == _forceFeedbackDeviceInstanceGuid ) )
+		{
+			normalized = ForceFeedbackWheelPosition;
+
+			return true;
+		}
+
+		if ( _joystickInfoDictionary.TryGetValue( deviceInstanceGuid, out var info ) && !info._isDefunct && ( info._xAxisProperties != null ) )
+		{
+			var range = info._xAxisProperties.Range.Maximum - info._xAxisProperties.Range.Minimum;
+
+			if ( range != 0 )
+			{
+				normalized = (float) ( 2.0 * ( info._joystickState.X - info._xAxisProperties.Range.Minimum ) / range - 1.0 );
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	[MethodImpl( MethodImplOptions.AggressiveInlining )]

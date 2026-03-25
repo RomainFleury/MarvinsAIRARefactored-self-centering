@@ -1,4 +1,4 @@
-﻿
+
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -243,6 +243,12 @@ public partial class Simulator
 
 		app.Logger.WriteLine( "[Simulator] OnConnected >>>" );
 
+#if !ADMINBOXX
+
+		app.DeactivateStandaloneCenteringSession();
+
+#endif
+
 		WindowHandle = User32.FindWindow( null, "iRacing.com Simulator" );
 
 		app.MultimediaTimer.Suspend = false;
@@ -379,7 +385,17 @@ public partial class Simulator
 
 #endif
 
+#if !ADMINBOXX
+
+		var settings = MarvinsAIRARefactored.DataContext.DataContext.Instance.Settings;
+
+		app.MultimediaTimer.Suspend = !( app.StandaloneCenteringSessionActive && settings.RacingWheelEnableForceFeedback );
+
+#else
+
 		app.MultimediaTimer.Suspend = true;
+
+#endif
 
 		app.MainWindow.UpdateStatus();
 
