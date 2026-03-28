@@ -1641,12 +1641,28 @@
     <value>Turn on FFB power on the Racing wheel page, pick your device in the list above, then start the session here. The session ends when you switch to another menu page or when iRacing connects.</value>
     <comment>Experimental wheel page</comment>
   </data>
-  <data name="ExperimentalWheelTuning_UC" xml:space="preserve">
-    <value>TUNING</value>
+  <data name="ExperimentalWheelCentering_UC" xml:space="preserve">
+    <value>CENTERING</value>
     <comment>Experimental wheel page group</comment>
   </data>
-  <data name="ExperimentalWheelTuningHint" xml:space="preserve">
-    <value>Centering strength uses the same global setting as the Racing wheel page. Soft lock below uses the wheel X axis from DirectInput (not iRacing).</value>
+  <data name="ExperimentalWheelCenteringHint" xml:space="preserve">
+    <value>Wheel centering strength is the same shared setting as on the Racing wheel page (including “while racing” / “while parked” there).</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelSoftLock_UC" xml:space="preserve">
+    <value>SOFT LOCK</value>
+    <comment>Experimental wheel page group</comment>
+  </data>
+  <data name="ExperimentalWheelSoftLockHint" xml:space="preserve">
+    <value>Uses the steering axis from DirectInput (not iRacing). The ramp begins at the threshold and increases toward full axis travel.</value>
+    <comment>Experimental wheel page</comment>
+  </data>
+  <data name="ExperimentalWheelCenterBump_UC" xml:space="preserve">
+    <value>CENTER BUMP</value>
+    <comment>Experimental wheel page group</comment>
+  </data>
+  <data name="ExperimentalWheelCenterBumpHint" xml:space="preserve">
+    <value>Ring-shaped “soft spot”: light centering inside the inner dead zone, then centering is multiplied down in the band (most in the middle, none at the outer edge). No outward push—only less inward pull. While you steer back toward center the dip turns off so centering stays strong through the ring.</value>
     <comment>Experimental wheel page</comment>
   </data>
   <data name="ExperimentalWheelDevice_UC" xml:space="preserve">
@@ -1677,6 +1693,46 @@
     <value>Steering axis: no data (device unplugged or not yet detected — try the Racing wheel page Refresh if needed)</value>
     <comment>Experimental wheel page</comment>
   </data>
+  <data name="ExperimentalWheelAxisMapLegend" xml:space="preserve">
+    <value>Bar: −1 … +1. Gray = straight ahead. Shaded = bump ring; thick blue = outer edge, thin blue = inner (dead zone inside). Orange = soft lock onset. White dot = wheel.</value>
+    <comment>Experimental wheel axis map</comment>
+  </data>
+  <data name="ExperimentalWheelPreviewCenteringCaption" xml:space="preserve">
+    <value>Live centering force (normalized, FFB mix)</value>
+    <comment>Experimental wheel — sparkline caption</comment>
+  </data>
+  <data name="ExperimentalWheelPreviewCenteringFormat" xml:space="preserve">
+    <value>{0:+0.000;-0.000;+0.000}</value>
+    <comment>Experimental wheel; {0} = torque −1…1</comment>
+  </data>
+  <data name="ExperimentalWheelPreviewCenteringSessionOff" xml:space="preserve">
+    <value>— start experimental session to stream the value that is mixed into FFB —</value>
+    <comment>Experimental wheel when standalone session inactive</comment>
+  </data>
+  <data name="ExperimentalWheelZoneCentered" xml:space="preserve">
+    <value>Zone: near straight ahead</value>
+    <comment>Experimental wheel live zone label when bump off</comment>
+  </data>
+  <data name="ExperimentalWheelZoneDeadZone" xml:space="preserve">
+    <value>Zone: bump dead zone (inside inner — light centering)</value>
+    <comment>Experimental wheel — steering magnitude inside bump inner radius</comment>
+  </data>
+  <data name="ExperimentalWheelZoneOnBump" xml:space="preserve">
+    <value>Zone: in bump ring (softest centering near band midpoint)</value>
+    <comment>Experimental wheel live zone label</comment>
+  </data>
+  <data name="ExperimentalWheelZoneAfterBump" xml:space="preserve">
+    <value>Zone: past center bump</value>
+    <comment>Experimental wheel live zone label</comment>
+  </data>
+  <data name="ExperimentalWheelZoneMidTravel" xml:space="preserve">
+    <value>Zone: mid travel (before soft lock)</value>
+    <comment>Experimental wheel live zone label</comment>
+  </data>
+  <data name="ExperimentalWheelZoneSoftLock" xml:space="preserve">
+    <value>Zone: soft lock ramp</value>
+    <comment>Experimental wheel live zone label</comment>
+  </data>
   <data name="ExperimentalWheelSelectDeviceBeforeSession" xml:space="preserve">
     <value>Select a steering device in the list before starting the session.</value>
     <comment>Message box</comment>
@@ -1692,6 +1748,22 @@
   <data name="ExperimentalWheelSoftLockThreshold" xml:space="preserve">
     <value>Soft lock start (axis %)</value>
     <comment>Experimental wheel — where ramp begins toward full travel</comment>
+  </data>
+  <data name="ExperimentalWheelCenterBumpEnabled" xml:space="preserve">
+    <value>Center bump</value>
+    <comment>Experimental wheel — extra centering near straight ahead</comment>
+  </data>
+  <data name="ExperimentalWheelCenterBumpStrength" xml:space="preserve">
+    <value>Bump peak strength</value>
+    <comment>Experimental wheel — scales peak extra centering in the bump ring (0 = off)</comment>
+  </data>
+  <data name="ExperimentalWheelCenterBumpInner" xml:space="preserve">
+    <value>Bump inner (dead zone edge)</value>
+    <comment>Experimental wheel — normalized |axis| where bump ring starts (center is lighter inside this)</comment>
+  </data>
+  <data name="ExperimentalWheelCenterBumpOuter" xml:space="preserve">
+    <value>Bump outer (ring end)</value>
+    <comment>Experimental wheel — normalized |axis| where bump ring ends</comment>
   </data>
   <data name="ExperimentalWheelEnableFFBFirst" xml:space="preserve">
     <value>Turn on force feedback power on the Racing wheel page before starting this session.</value>

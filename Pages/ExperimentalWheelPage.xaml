@@ -60,6 +60,137 @@
                            FontSize="18"
                            FontFamily="Consolas" />
 
+                <TextBlock x:Name="SteeringAxisZone_TextBlock"
+                           Style="{StaticResource MairaTextBlockStyle}"
+                           TextWrapping="Wrap"
+                           Foreground="#cccccc"
+                           Margin="0,10,0,0"
+                           FontSize="16" />
+
+                <Border x:Name="AxisMapHost"
+                        Height="40"
+                        Margin="0,8,0,0"
+                        BorderBrush="#444444"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        ClipToBounds="True"
+                        SizeChanged="AxisMapHost_SizeChanged">
+
+                    <Canvas x:Name="AxisMapCanvas"
+                            Height="40"
+                            VerticalAlignment="Stretch">
+
+                        <Rectangle x:Name="AxisMapBumpFillNeg"
+                                   Fill="#2233AA55"
+                                   Height="40"
+                                   Canvas.Top="0" />
+
+                        <Rectangle x:Name="AxisMapBumpFillPos"
+                                   Fill="#2233AA55"
+                                   Height="40"
+                                   Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapSoftLockLeft"
+                                Width="2"
+                                Height="40"
+                                Background="#CC8833"
+                                Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapSoftLockRight"
+                                Width="2"
+                                Height="40"
+                                Background="#CC8833"
+                                Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapBumpLineNegOuter"
+                                Width="2"
+                                Height="40"
+                                Background="#66AAEE"
+                                Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapBumpLineNegInner"
+                                Width="1"
+                                Height="40"
+                                Background="#5599DD"
+                                Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapBumpLinePosInner"
+                                Width="1"
+                                Height="40"
+                                Background="#5599DD"
+                                Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapBumpLinePosOuter"
+                                Width="2"
+                                Height="40"
+                                Background="#66AAEE"
+                                Canvas.Top="0" />
+
+                        <Border x:Name="AxisMapCenterLine"
+                                Width="2"
+                                Height="40"
+                                Background="#777777"
+                                Canvas.Top="0" />
+
+                        <Ellipse x:Name="AxisMapNeedle"
+                                 Width="11"
+                                 Height="11"
+                                 Fill="#F0F0F0"
+                                 Stroke="#202020"
+                                 StrokeThickness="1" />
+
+                    </Canvas>
+
+                </Border>
+
+                <TextBlock Style="{StaticResource MairaTextBlockStyle}"
+                           TextWrapping="Wrap"
+                           Foreground="#666666"
+                           Margin="0,6,0,0"
+                           FontSize="12"
+                           Text="{Binding Localization[ExperimentalWheelAxisMapLegend]}" />
+
+                <TextBlock x:Name="PreviewCenteringCaption_TextBlock"
+                           Style="{StaticResource MairaTextBlockStyle}"
+                           Foreground="#888888"
+                           Margin="0,14,0,4"
+                           FontSize="13"
+                           Text="{Binding Localization[ExperimentalWheelPreviewCenteringCaption]}" />
+
+                <TextBlock x:Name="PreviewCenteringValue_TextBlock"
+                           Style="{StaticResource MairaTextBlockStyle}"
+                           Foreground="#C8E8F8"
+                           FontSize="18"
+                           FontFamily="Consolas"
+                           Text="" />
+
+                <Border Margin="0,6,0,0"
+                        Height="56"
+                        BorderBrush="#444444"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        ClipToBounds="True"
+                        SizeChanged="PreviewForceArea_SizeChanged">
+
+                    <Canvas x:Name="PreviewForceCanvas"
+                            Background="#12181c"
+                            SnapsToDevicePixels="True">
+
+                        <Line x:Name="PreviewForceMidLine"
+                              Y1="28"
+                              Y2="28"
+                              Stroke="#333333"
+                              StrokeThickness="1" />
+
+                        <Polyline x:Name="PreviewForcePolyline"
+                                  Stroke="#7EC8E3"
+                                  StrokeThickness="1.25"
+                                  SnapsToDevicePixels="True" />
+
+                    </Canvas>
+
+                </Border>
+
             </StackPanel>
 
         </controls:MairaGroupBox>
@@ -82,7 +213,7 @@
 
         </controls:MairaGroupBox>
 
-        <controls:MairaGroupBox Label="{Binding Localization[ExperimentalWheelTuning_UC]}"
+        <controls:MairaGroupBox Label="{Binding Localization[ExperimentalWheelCentering_UC]}"
                                 Margin="0,20,0,0">
 
             <StackPanel>
@@ -91,32 +222,34 @@
                            TextWrapping="Wrap"
                            Foreground="#888"
                            Margin="0,0,0,10"
-                           Text="{Binding Localization[ExperimentalWheelTuningHint]}" />
+                           Text="{Binding Localization[ExperimentalWheelCenteringHint]}" />
 
-                <Grid>
+                <controls:MairaKnob Label="{Binding Localization[WheelCenteringStrength]}"
+                                    Value="{Binding Settings.RacingWheelWheelCenteringStrength, Mode=TwoWay}"
+                                    ValueString="{Binding Settings.RacingWheelWheelCenteringStrengthString}"
+                                    StepSize="0.01"
+                                    ContextSwitches="{Binding Settings.RacingWheelWheelCenteringStrengthContextSwitches}"
+                                    PlusButtonMappings="{Binding Settings.RacingWheelWheelCenteringStrengthPlusButtonMappings}"
+                                    MinusButtonMappings="{Binding Settings.RacingWheelWheelCenteringStrengthMinusButtonMappings}"
+                                    DefaultValue="0.75" />
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="40" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            </StackPanel>
 
-                    <controls:MairaKnob Grid.Column="0"
-                                        Label="{Binding Localization[WheelCenteringStrength]}"
-                                        Value="{Binding Settings.RacingWheelWheelCenteringStrength, Mode=TwoWay}"
-                                        ValueString="{Binding Settings.RacingWheelWheelCenteringStrengthString}"
-                                        StepSize="0.01"
-                                        ContextSwitches="{Binding Settings.RacingWheelWheelCenteringStrengthContextSwitches}"
-                                        PlusButtonMappings="{Binding Settings.RacingWheelWheelCenteringStrengthPlusButtonMappings}"
-                                        MinusButtonMappings="{Binding Settings.RacingWheelWheelCenteringStrengthMinusButtonMappings}"
-                                        DefaultValue="0.75" />
+        </controls:MairaGroupBox>
 
-                    <controls:MairaSwitch Grid.Column="2"
-                                          VerticalAlignment="Center"
-                                          Label="{Binding Localization[ExperimentalWheelSoftLockEnabled]}"
-                                          IsOn="{Binding Settings.ExperimentalWheelSoftLockEnabled, Mode=TwoWay}" />
+        <controls:MairaGroupBox Label="{Binding Localization[ExperimentalWheelSoftLock_UC]}"
+                                Margin="0,16,0,0">
 
-                </Grid>
+            <StackPanel>
+
+                <TextBlock Style="{StaticResource MairaTextBlockStyle}"
+                           TextWrapping="Wrap"
+                           Foreground="#888"
+                           Margin="0,0,0,10"
+                           Text="{Binding Localization[ExperimentalWheelSoftLockHint]}" />
+
+                <controls:MairaSwitch Label="{Binding Localization[ExperimentalWheelSoftLockEnabled]}"
+                                      IsOn="{Binding Settings.ExperimentalWheelSoftLockEnabled, Mode=TwoWay}" />
 
                 <Grid Margin="0,16,0,0">
 
@@ -145,6 +278,76 @@
                                         PlusButtonMappings="{Binding Settings.ExperimentalWheelSoftLockThresholdPlusButtonMappings}"
                                         MinusButtonMappings="{Binding Settings.ExperimentalWheelSoftLockThresholdMinusButtonMappings}"
                                         DefaultValue="0.85" />
+
+                </Grid>
+
+            </StackPanel>
+
+        </controls:MairaGroupBox>
+
+        <controls:MairaGroupBox Label="{Binding Localization[ExperimentalWheelCenterBump_UC]}"
+                                Margin="0,16,0,0">
+
+            <StackPanel>
+
+                <TextBlock Style="{StaticResource MairaTextBlockStyle}"
+                           TextWrapping="Wrap"
+                           Foreground="#888"
+                           Margin="0,0,0,10"
+                           Text="{Binding Localization[ExperimentalWheelCenterBumpHint]}" />
+
+                <Grid>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:MairaSwitch Grid.Column="0"
+                                          VerticalAlignment="Center"
+                                          Label="{Binding Localization[ExperimentalWheelCenterBumpEnabled]}"
+                                          IsOn="{Binding Settings.ExperimentalWheelCenterBumpEnabled, Mode=TwoWay}" />
+
+                    <controls:MairaKnob Grid.Column="2"
+                                        Label="{Binding Localization[ExperimentalWheelCenterBumpStrength]}"
+                                        Value="{Binding Settings.ExperimentalWheelCenterBumpStrength, Mode=TwoWay}"
+                                        ValueString="{Binding Settings.ExperimentalWheelCenterBumpStrengthString}"
+                                        StepSize="0.01"
+                                        ContextSwitches="{Binding Settings.ExperimentalWheelCenterBumpStrengthContextSwitches}"
+                                        PlusButtonMappings="{Binding Settings.ExperimentalWheelCenterBumpStrengthPlusButtonMappings}"
+                                        MinusButtonMappings="{Binding Settings.ExperimentalWheelCenterBumpStrengthMinusButtonMappings}"
+                                        DefaultValue="0.35" />
+
+                </Grid>
+
+                <Grid Margin="0,16,0,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:MairaKnob Grid.Column="0"
+                                        Label="{Binding Localization[ExperimentalWheelCenterBumpInner]}"
+                                        Value="{Binding Settings.ExperimentalWheelCenterBumpInner, Mode=TwoWay}"
+                                        ValueString="{Binding Settings.ExperimentalWheelCenterBumpInnerString}"
+                                        StepSize="0.005"
+                                        ContextSwitches="{Binding Settings.ExperimentalWheelCenterBumpInnerContextSwitches}"
+                                        PlusButtonMappings="{Binding Settings.ExperimentalWheelCenterBumpInnerPlusButtonMappings}"
+                                        MinusButtonMappings="{Binding Settings.ExperimentalWheelCenterBumpInnerMinusButtonMappings}"
+                                        DefaultValue="0.02" />
+
+                    <controls:MairaKnob Grid.Column="2"
+                                        Label="{Binding Localization[ExperimentalWheelCenterBumpOuter]}"
+                                        Value="{Binding Settings.ExperimentalWheelCenterBumpOuter, Mode=TwoWay}"
+                                        ValueString="{Binding Settings.ExperimentalWheelCenterBumpOuterString}"
+                                        StepSize="0.01"
+                                        ContextSwitches="{Binding Settings.ExperimentalWheelCenterBumpOuterContextSwitches}"
+                                        PlusButtonMappings="{Binding Settings.ExperimentalWheelCenterBumpOuterPlusButtonMappings}"
+                                        MinusButtonMappings="{Binding Settings.ExperimentalWheelCenterBumpOuterMinusButtonMappings}"
+                                        DefaultValue="0.10" />
 
                 </Grid>
 

@@ -54,6 +54,11 @@ public class ContextSettings
 	public float ExperimentalWheelSoftLockStrength { get; set; } = 0.25f;
 	public float ExperimentalWheelSoftLockThreshold { get; set; } = 0.85f;
 
+	public bool ExperimentalWheelCenterBumpEnabled { get; set; } = false;
+	public float ExperimentalWheelCenterBumpStrength { get; set; } = 0.35f;
+	public float ExperimentalWheelCenterBumpInner { get; set; } = 0.02f;
+	public float ExperimentalWheelCenterBumpOuter { get; set; } = 0.10f;
+
 	#endregion
 
 	#region Steering effects - General

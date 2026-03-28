@@ -1076,7 +1076,7 @@ public class Settings : INotifyPropertyChanged
 
                 if (!_updatingRacingWheelMultiSettings)
                 {
-                    app.RacingWheel.SetCannedMultiAdjustAlgorithmValues();
+                    global::MarvinsAIRARefactored.Components.RacingWheel.SetCannedMultiAdjustAlgorithmValues();
 
                     _updatingRacingWheelMultiSettings = true;
 
@@ -2379,6 +2379,206 @@ public class Settings : INotifyPropertyChanged
 	public ContextSwitches ExperimentalWheelSoftLockThresholdContextSwitches { get; set; } = new( true, false, false, false, false );
 	public ButtonMappings ExperimentalWheelSoftLockThresholdPlusButtonMappings { get; set; } = new();
 	public ButtonMappings ExperimentalWheelSoftLockThresholdMinusButtonMappings { get; set; } = new();
+
+	private bool _experimentalWheelCenterBumpEnabled = false;
+
+	public bool ExperimentalWheelCenterBumpEnabled
+	{
+		get => _experimentalWheelCenterBumpEnabled;
+
+		set
+		{
+			if ( value != _experimentalWheelCenterBumpEnabled )
+			{
+				_experimentalWheelCenterBumpEnabled = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	private float _experimentalWheelCenterBumpStrength = 0.35f;
+
+	public float ExperimentalWheelCenterBumpStrength
+	{
+		get => _experimentalWheelCenterBumpStrength;
+
+		set
+		{
+			value = MathZ.Saturate( value );
+
+			if ( value != _experimentalWheelCenterBumpStrength )
+			{
+				_experimentalWheelCenterBumpStrength = value;
+
+				OnPropertyChanged();
+			}
+
+			UpdateExperimentalWheelCenterBumpStrengthString();
+		}
+	}
+
+	private string _experimentalWheelCenterBumpStrengthString = string.Empty;
+
+	[XmlIgnore]
+	public string ExperimentalWheelCenterBumpStrengthString
+	{
+		get => _experimentalWheelCenterBumpStrengthString;
+
+		set
+		{
+			if ( value != _experimentalWheelCenterBumpStrengthString )
+			{
+				_experimentalWheelCenterBumpStrengthString = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	private void UpdateExperimentalWheelCenterBumpStrengthString()
+	{
+		if ( _experimentalWheelCenterBumpStrength == 0f )
+		{
+			ExperimentalWheelCenterBumpStrengthString = DataContext.Instance.Localization[ "OFF" ];
+		}
+		else
+		{
+			ExperimentalWheelCenterBumpStrengthString = $"{_experimentalWheelCenterBumpStrength * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+		}
+	}
+
+	private float _experimentalWheelCenterBumpInner = 0.02f;
+
+	public float ExperimentalWheelCenterBumpInner
+	{
+		get => _experimentalWheelCenterBumpInner;
+
+		set
+		{
+			const float gap = 0.01f;
+
+			value = Math.Clamp( value, 0.005f, 0.28f );
+
+			var innerChanged = value != _experimentalWheelCenterBumpInner;
+
+			_experimentalWheelCenterBumpInner = value;
+
+			var outerNudged = false;
+
+			if ( _experimentalWheelCenterBumpOuter < _experimentalWheelCenterBumpInner + gap )
+			{
+				_experimentalWheelCenterBumpOuter = Math.Min( 0.35f, _experimentalWheelCenterBumpInner + gap );
+
+				outerNudged = true;
+			}
+
+			if ( innerChanged )
+			{
+				OnPropertyChanged();
+			}
+
+			ExperimentalWheelCenterBumpInnerString = $"{_experimentalWheelCenterBumpInner * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+
+			if ( outerNudged )
+			{
+				ExperimentalWheelCenterBumpOuterString = $"{_experimentalWheelCenterBumpOuter * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+
+				OnPropertyChanged( nameof( ExperimentalWheelCenterBumpOuter ) );
+				OnPropertyChanged( nameof( ExperimentalWheelCenterBumpOuterString ) );
+			}
+		}
+	}
+
+	private string _experimentalWheelCenterBumpInnerString = string.Empty;
+
+	[XmlIgnore]
+	public string ExperimentalWheelCenterBumpInnerString
+	{
+		get => _experimentalWheelCenterBumpInnerString;
+
+		set
+		{
+			if ( value != _experimentalWheelCenterBumpInnerString )
+			{
+				_experimentalWheelCenterBumpInnerString = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	private float _experimentalWheelCenterBumpOuter = 0.10f;
+
+	public float ExperimentalWheelCenterBumpOuter
+	{
+		get => _experimentalWheelCenterBumpOuter;
+
+		set
+		{
+			const float gap = 0.01f;
+
+			value = Math.Clamp( value, 0.03f, 0.35f );
+
+			var outerChanged = value != _experimentalWheelCenterBumpOuter;
+
+			_experimentalWheelCenterBumpOuter = value;
+
+			var innerNudged = false;
+
+			if ( _experimentalWheelCenterBumpInner > _experimentalWheelCenterBumpOuter - gap )
+			{
+				_experimentalWheelCenterBumpInner = Math.Max( 0.005f, _experimentalWheelCenterBumpOuter - gap );
+
+				innerNudged = true;
+			}
+
+			if ( outerChanged )
+			{
+				OnPropertyChanged();
+			}
+
+			ExperimentalWheelCenterBumpOuterString = $"{_experimentalWheelCenterBumpOuter * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+
+			if ( innerNudged )
+			{
+				ExperimentalWheelCenterBumpInnerString = $"{_experimentalWheelCenterBumpInner * 100f:F0}{DataContext.Instance.Localization[ "Percent" ]}";
+
+				OnPropertyChanged( nameof( ExperimentalWheelCenterBumpInner ) );
+				OnPropertyChanged( nameof( ExperimentalWheelCenterBumpInnerString ) );
+			}
+		}
+	}
+
+	private string _experimentalWheelCenterBumpOuterString = string.Empty;
+
+	[XmlIgnore]
+	public string ExperimentalWheelCenterBumpOuterString
+	{
+		get => _experimentalWheelCenterBumpOuterString;
+
+		set
+		{
+			if ( value != _experimentalWheelCenterBumpOuterString )
+			{
+				_experimentalWheelCenterBumpOuterString = value;
+
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	public ContextSwitches ExperimentalWheelCenterBumpStrengthContextSwitches { get; set; } = new( true, false, false, false, false );
+	public ButtonMappings ExperimentalWheelCenterBumpStrengthPlusButtonMappings { get; set; } = new();
+	public ButtonMappings ExperimentalWheelCenterBumpStrengthMinusButtonMappings { get; set; } = new();
+
+	public ContextSwitches ExperimentalWheelCenterBumpInnerContextSwitches { get; set; } = new( true, false, false, false, false );
+	public ButtonMappings ExperimentalWheelCenterBumpInnerPlusButtonMappings { get; set; } = new();
+	public ButtonMappings ExperimentalWheelCenterBumpInnerMinusButtonMappings { get; set; } = new();
+
+	public ContextSwitches ExperimentalWheelCenterBumpOuterContextSwitches { get; set; } = new( true, false, false, false, false );
+	public ButtonMappings ExperimentalWheelCenterBumpOuterPlusButtonMappings { get; set; } = new();
+	public ButtonMappings ExperimentalWheelCenterBumpOuterMinusButtonMappings { get; set; } = new();
 
 	#endregion
 

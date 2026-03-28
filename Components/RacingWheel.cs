@@ -97,6 +97,9 @@ public class RacingWheel
 
 	public float AutoTorque { get => _autoTorque; }
 	public float OutputTorque { get => _outputTorque; }
+
+	/// <summary>Normalized centering contribution last applied (−1…1) for standalone experimental session; updated each FFB tick.</summary>
+	public float ExperimentalSessionLastCenteringTorque { get; private set; }
 	public bool CrashProtectionIsActive { get => _crashProtectionTimerMS > 0f; }
 	public bool CurbProtectionIsActive { get => _curbProtectionTimerMS > 0f; }
 	public bool FadingIsActive { get => _fadeTimerMS > 0f; }
@@ -203,7 +206,7 @@ public class RacingWheel
 		}
 	}
 
-	public void SetCannedMultiAdjustAlgorithmValues()
+	public static void SetCannedMultiAdjustAlgorithmValues()
 	{
 		var settings = DataContext.DataContext.Instance.Settings;
 
@@ -435,14 +438,13 @@ public class RacingWheel
 				const int indexTicksSinceLast60Hz = 10;
 				const int indexPeakCountdown = 11;
 
-				var lastTorque60Hz = 0f;
 				var ticksSinceLast60Hz = 0f;
 				var peakCountdown = MathF.Max( 0f, _algorithmProperties[ algorithmPropertyIndex, indexPeakCountdown ] - 1f );
 				var hybridLastTorque = 0f;
 				if ( settings.RacingWheelAlgorithm == _lastAlgorithm[ algorithmPropertyIndex ] )
 				{
-					lastTorque60Hz = _algorithmProperties[ algorithmPropertyIndex, index60HzLastTorque ];
-					ticksSinceLast60Hz = ( lastTorque60Hz == steeringWheelTorque60Hz ) ? ( _algorithmProperties[ algorithmPropertyIndex, indexTicksSinceLast60Hz ] + 1f ) : 0f;
+					var prevTorque60Hz = _algorithmProperties[ algorithmPropertyIndex, index60HzLastTorque ];
+					ticksSinceLast60Hz = ( prevTorque60Hz == steeringWheelTorque60Hz ) ? ( _algorithmProperties[ algorithmPropertyIndex, indexTicksSinceLast60Hz ] + 1f ) : 0f;
 					hybridLastTorque = _algorithmProperties[ algorithmPropertyIndex, indexHybridLastTorque ];
 				}
 
@@ -684,6 +686,8 @@ public class RacingWheel
 			var settings = DataContext.DataContext.Instance.Settings;
 
 			var standaloneSessionDisconnected = app.StandaloneCenteringSessionActive && !app.Simulator.IsConnected;
+
+			ExperimentalSessionLastCenteringTorque = 0f;
 
 			// initialize generated vibration torque
 
@@ -1420,12 +1424,73 @@ public class RacingWheel
 
 			if ( app.Simulator.IsOnTrack || standaloneSessionDisconnected )
 			{
-				var centeringForce = Math.Clamp( ( Math.Clamp( app.DirectInput.ForceFeedbackWheelPosition, -0.25f, 0.25f ) + app.DirectInput.ForceFeedbackWheelVelocity * 0.1f ) * settings.RacingWheelWheelCenteringStrength, -1f, 1f );
+				var wheelPos = app.DirectInput.ForceFeedbackWheelPosition;
+				var wheelVel = app.DirectInput.ForceFeedbackWheelVelocity;
+				var centeringStrength = settings.RacingWheelWheelCenteringStrength;
+				var posClamped = Math.Clamp( wheelPos, -0.25f, 0.25f );
+				var blended = ( posClamped + wheelVel * 0.1f ) * centeringStrength;
+				var centeringForce = Math.Clamp( blended, -1f, 1f );
+
+				if ( standaloneSessionDisconnected && settings.ExperimentalWheelCenterBumpEnabled && ( settings.ExperimentalWheelCenterBumpStrength > 0f ) )
+				{
+					var inner = settings.ExperimentalWheelCenterBumpInner;
+					var outer = settings.ExperimentalWheelCenterBumpOuter;
+					var absP = MathF.Abs( wheelPos );
+
+					// Dead zone: fade base centering to zero at exact center so the bump feels like a ring, not a hill at 0.
+					if ( inner > 1e-5f && absP < inner )
+					{
+						var u = absP / inner;
+
+						centeringForce *= u * u;
+					}
+
+					var span = outer - inner;
+
+					if ( span > 1e-5f && absP >= inner && absP <= outer )
+					{
+						var ringT = ( absP - inner ) / span;
+						var envelope = 4f * ringT * ( 1f - ringT );
+
+						// Softer trough in the ring: reduce magnitude only (same sign as base centering). While returning
+						// toward center, dip is off so centering can pull through; while opening outward or at rest, dip
+						// follows the bell envelope (scales with bump strength × wheel centering knob).
+						const float velDead = 0.002f;
+						float dipScale;
+
+						if ( MathF.Abs( wheelVel ) <= velDead )
+						{
+							dipScale = 1f;
+						}
+						else if ( ( wheelPos * wheelVel ) < 0f )
+						{
+							dipScale = 0f;
+						}
+						else
+						{
+							dipScale = 1f;
+						}
+
+						var dip = settings.ExperimentalWheelCenterBumpStrength * centeringStrength * envelope * dipScale;
+						dip = Math.Min( dip, 0.95f );
+
+						centeringForce *= 1f - dip;
+					}
+
+					centeringForce = Math.Clamp( centeringForce, -1f, 1f );
+				}
 
 				var racingCenteringForce = ( settings.RacingWheelCenterWheelWhileRacing ) ? centeringForce : 0f;
 				var parkedCenteringForce = ( settings.RacingWheelCenterWheelWhileParked ) ? centeringForce : 0f;
 
-				outputTorque += MathZ.Lerp( racingCenteringForce, parkedCenteringForce, parkedFactor );
+				var centeringContribution = MathZ.Lerp( racingCenteringForce, parkedCenteringForce, parkedFactor );
+
+				outputTorque += centeringContribution;
+
+				if ( standaloneSessionDisconnected )
+				{
+					ExperimentalSessionLastCenteringTorque = centeringContribution;
+				}
 			}
 
 			// apply vibration effects and fade (vibration effects not played while fading out)
